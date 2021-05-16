@@ -4,9 +4,74 @@ const IMGPATH = "https://image.tmdb.org/t/p/w1280";
 var search = document.getElementById("input");
 var search1 = document.getElementById("search1");
 
+document.getElementById("button").onclick = () => {
+  window.location.reload()
+}
+async function Movies() {
 
+  search1.onclick = async () => {
+    var r = await fetch(MOVIE_API_URL + search.value);
+    var rData = await r.json();
 
-//Enter ataması yapıyoruz
+    rData.results.forEach(movie => {
+      const {
+        id,
+        title,
+        vote_average,
+        poster_path
+
+      } = movie;
+  
+
+      if (IMGPATH + poster_path != "https://image.tmdb.org/t/p/w1280null") {
+
+        var container2 = document.querySelector(".container-movie1");
+        var container = document.createElement("div");
+        
+        container.innerHTML = `
+  <div class="container-movie"> 
+   <img class="poster"
+   src="${IMGPATH+poster_path}"
+   />
+   <div class="title1"> 
+   ${title}
+ 
+       </div>
+       <img 
+       src="cancel.svg"
+       class="cancel"
+       />
+       <span class="${notAverage(vote_average)}">
+ 
+${vote_average}
+
+</span>
+
+   </div> 
+
+  `;
+  document.querySelector(".container-movie1").onclick = (e) => {
+    if (e.target.className == "cancel")
+       e.target.parentElement.remove();
+  }
+        function notAverage(average) {
+
+          if (average > 8) {
+            return "green";
+          } else if (average >= 5) {
+            return "orange";
+          } else {
+            return "red";
+          }
+        }
+        container2.appendChild(container);
+
+        
+      }
+    });
+  }
+}
+Movies();
 search.addEventListener("keyup", function (event) {
 
   if (event.keyCode === 13) {
@@ -16,74 +81,3 @@ search.addEventListener("keyup", function (event) {
     document.getElementById("search1").click();
   }
 });
-
-////Programın çalısması için fonksiyonu çalıstırıyoruz..
-Movies();
-
-document.getElementById("button").onclick = () => {
-  window.location.reload()
-}
-async function Movies() {
-
-  search1.onclick = async () => {
-    var r = await fetch(MOVIE_API_URL + search.value);//API üzerinden aldığımız adresi ve bizim girdiğimiz inputun eş zamanlı çalısması için bu şekil de yazıyoruz.
-    var rData = await r.json(); //json atamasını yapıyoruz
-
-    rData.results.map(movie => {
-      const {
-        id,
-        title,
-        vote_average,
-        poster_path
-      } = movie;  //çekeceğimiz başlıkları programda gösteriyoruz..
-
-
-
-
-  //null değerleri almıyoruz   
-   if (IMGPATH + poster_path != "https://image.tmdb.org/t/p/w1280null")  {
-        
-   var container2 = document.querySelector(".container-movie1");
-
-        var container = document.createElement("div");
-        container.className = "container-movie";
-
-        var poster = document.createElement("IMG");
-        poster.src = IMGPATH + poster_path;
-        poster.className = "poster";
-        poster.innerHTML = movie.poster_path;
-
-        var title1 = document.createElement("div");
-        title1.className = "title1";
-        title1.innerHTML = movie.title;
-
-           //vote numaralarının rengini değiştirmek için bu fonksiyonu kullanıyoruz..
-        function not() {
-          var vote1 = document.createElement("div");
-          vote1.innerHTML = movie.vote_average;
-
-          if (Number(vote1.innerHTML) > 8) {
-            vote1.className = "vote3";
-            container.appendChild(vote1);
-          } else if (Number(vote1.innerHTML) >= 5) {
-            vote1.className = "vote2";
-            container.appendChild(vote1);
-          } else if (Number(vote1.innerHTML < 5)) {
-            vote1.className = "vote1";
-            container.appendChild(vote1);
-          }
-        }
-
-        //parent child atamalarını yapıyoruz. en üst parent container2 olacak şekilde. container2=container-move..
-        container.appendChild(poster);
-        container.appendChild(title1);
-        container2.appendChild(container);
-        //en sonda da not fonksiyonunu çağırıyoruz..
-        not();
-
-      } else {
-        console.log("Fotoğrafı görünmeyenler silindi***");
-      }
-    });
-  }
-}
